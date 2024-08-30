@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repository File List</title>
+    <title>授業資料</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
         h1 { color: #333; }
-        #file-list { list-style-type: none; padding: 0; }
-        #file-list li { margin-bottom: 10px; }
+        #file-list { padding-left: 20px; }
+        #file-list li { margin-bottom: 5px; }
         #file-list a { color: #0366d6; text-decoration: none; }
         #file-list a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <h1>Repository File List</h1>
+    <h1>授業資料</h1>
     <ul id="file-list"></ul>
 
     <script>
@@ -29,34 +29,37 @@
             return data;
         }
 
-        function createFileLink(file, path) {
-            const li = document.createElement('li');
+        function createFileLink(file) {
             const a = document.createElement('a');
             a.href = `https://${owner}.github.io/${repo}/${file.path}`;
-            a.textContent = (path ? path + '/' : '') + file.name;
+            a.textContent = file.name;
             a.target = '_blank';
-            li.appendChild(a);
-            return li;
+            return a;
         }
 
         async function displayFiles() {
             const fileList = document.getElementById('file-list');
             
-            async function processDirectory(path = '') {
+            async function processDirectory(parentElement, path = '') {
                 const files = await getFiles(path);
                 for (const file of files) {
                     if (file.name === 'README.md' || file.name === 'index.html') {
                         continue;
                     }
+                    const li = document.createElement('li');
                     if (file.type === 'file') {
-                        fileList.appendChild(createFileLink(file, path));
+                        li.appendChild(createFileLink(file));
                     } else if (file.type === 'dir') {
-                        await processDirectory(file.path);
+                        li.textContent = file.name;
+                        const ul = document.createElement('ul');
+                        li.appendChild(ul);
+                        await processDirectory(ul, file.path);
                     }
+                    parentElement.appendChild(li);
                 }
             }
 
-            await processDirectory();
+            await processDirectory(fileList);
         }
 
         displayFiles().catch(console.error);
