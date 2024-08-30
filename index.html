@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>授業資料</title>
+    <title>Repository File List</title>
     <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
         h1 { color: #333; }
@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <h1>授業資料</h1>
+    <h1>Repository File List</h1>
     <ul id="file-list"></ul>
 
     <script>
@@ -29,20 +29,28 @@
             return data;
         }
 
+        function createFileLink(file, path) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `https://${owner}.github.io/${repo}/${file.path}`;
+            a.textContent = (path ? path + '/' : '') + file.name;
+            a.target = '_blank';
+            li.appendChild(a);
+            return li;
+        }
+
         async function displayFiles() {
             const fileList = document.getElementById('file-list');
             
             async function processDirectory(path = '') {
                 const files = await getFiles(path);
                 for (const file of files) {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = file.html_url;
-                    a.textContent = (path ? path + '/' : '') + file.name;
-                    li.appendChild(a);
-                    fileList.appendChild(li);
-
-                    if (file.type === 'dir') {
+                    if (file.name === 'README.md' || file.name === 'index.html') {
+                        continue;
+                    }
+                    if (file.type === 'file') {
+                        fileList.appendChild(createFileLink(file, path));
+                    } else if (file.type === 'dir') {
                         await processDirectory(file.path);
                     }
                 }
