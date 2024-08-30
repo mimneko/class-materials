@@ -4,23 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>授業資料</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-        h1 { color: #333; }
-        #file-list { padding-left: 20px; }
-        #file-list li { margin-bottom: 5px; }
-        #file-list a { color: #0366d6; text-decoration: none; }
-        #file-list a:hover { text-decoration: underline; }
-    </style>
+    <link rel="stylesheet" href="https://mimneko.github.io/note/assets/css/styles.css">
 </head>
 <body>
-    <h1>授業資料</h1>
-    <ul id="file-list"></ul>
+    <div class="page-container">
+        
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <a href="https://mimneko.github.io/note/">
+                        <img src="https://mimneko.github.io/note/assets/icons/mimneko-note-icon.png" alt="サイトアイコン" class="site-icon">
+                        <span class="site-name">みむねこのーと</span>
+                    </a>
+                </div>
+                <!-- _includes/navigation.html -->
+                <nav class="nav-content">
+                    <ul class="nav-list">
+                        <li><a href="https://mimneko.github.io/note/">ホーム</a></li>
+                        <li><a href="https://mimneko.github.io/note/about/">このサイトについて</a></li>
+                        <li><a href="https://mimneko.github.io/note/tags/">カテゴリ＆タグ</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+        <main>
+            <div class="main-content">
+                <div class="main-wrap">
+                    <article>
+                        <div class="article-header">
+                            <h1 id="article-title">授業資料</h1>
+                            <div id="article-meta">
+                            </div>
+                        </div>
+                        <div class="article-body">
+                            <div class="folder-tree">
+                                <ul id="file-list"></ul>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="footer-content">
+                <!-- _includes/navigation.html -->
+                <nav class="nav-content">
+                    <ul class="nav-list">
+                        <li><a href="https://mimneko.github.io/note/">ホーム</a></li>
+                        <li><a href="https://mimneko.github.io/note/about/">このサイトについて</a></li>
+                        <li><a href="https://mimneko.github.io/note/tags/">カテゴリ＆タグ</a></li>
+                    </ul>
+                </nav>
+                <p class="copyright">Copyright © 2023 - 2024 みむねこのーと.<br class="copyright-break"> All rights reserved.</p>
+            </div>
+        </footer>
+        
+    </div>
 
     <script>
         const owner = 'mimneko';
         const repo = 'class-materials';
-        const branch = 'main'; // or your default branch name
+        const branch = 'main';
 
         async function getFiles(path = '') {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
@@ -37,32 +83,31 @@
             return a;
         }
 
-        async function displayFiles() {
-            const fileList = document.getElementById('file-list');
-            
-            async function processDirectory(parentElement, path = '') {
-                const files = await getFiles(path);
-                for (const file of files) {
-                    if (file.name === 'README.md' || file.name === 'index.html') {
-                        continue;
-                    }
-                    const li = document.createElement('li');
-                    if (file.type === 'file') {
-                        li.appendChild(createFileLink(file));
-                    } else if (file.type === 'dir') {
-                        li.textContent = file.name;
-                        const ul = document.createElement('ul');
-                        li.appendChild(ul);
-                        await processDirectory(ul, file.path);
-                    }
-                    parentElement.appendChild(li);
+        async function displayFiles(parentElement, path = '') {
+            const files = await getFiles(path);
+            for (const file of files) {
+                if (file.name === 'README.md' || file.name === 'index.html') {
+                    continue;
                 }
+                const li = document.createElement('li');
+                if (file.type === 'file') {
+                    li.appendChild(createFileLink(file));
+                } else if (file.type === 'dir') {
+                    const details = document.createElement('details');
+                    details.open = true; // デフォルトで開いた状態にする
+                    const summary = document.createElement('summary');
+                    summary.textContent = file.name;
+                    details.appendChild(summary);
+                    const ul = document.createElement('ul');
+                    details.appendChild(ul);
+                    li.appendChild(details);
+                    await displayFiles(ul, file.path);
+                }
+                parentElement.appendChild(li);
             }
-
-            await processDirectory(fileList);
         }
 
-        displayFiles().catch(console.error);
+        displayFiles(document.getElementById('file-list')).catch(console.error);
     </script>
 </body>
 </html>
