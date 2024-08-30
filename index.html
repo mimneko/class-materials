@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>授業資料</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+        h1 { color: #333; }
+        #file-list { list-style-type: none; padding: 0; }
+        #file-list li { margin-bottom: 10px; }
+        #file-list a { color: #0366d6; text-decoration: none; }
+        #file-list a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>授業資料</h1>
+    <ul id="file-list"></ul>
+
+    <script>
+        const owner = 'mimneko';
+        const repo = 'class-materials';
+        const branch = 'main'; // or your default branch name
+
+        async function getFiles(path = '') {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data;
+        }
+
+        async function displayFiles() {
+            const fileList = document.getElementById('file-list');
+            
+            async function processDirectory(path = '') {
+                const files = await getFiles(path);
+                for (const file of files) {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = file.html_url;
+                    a.textContent = (path ? path + '/' : '') + file.name;
+                    li.appendChild(a);
+                    fileList.appendChild(li);
+
+                    if (file.type === 'dir') {
+                        await processDirectory(file.path);
+                    }
+                }
+            }
+
+            await processDirectory();
+        }
+
+        displayFiles().catch(console.error);
+    </script>
+</body>
+</html>
