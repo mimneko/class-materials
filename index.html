@@ -5,5 +5,27 @@ scripts: ['/script.js']
 ---
 
 <div class="folder-tree">
-    <ul id="file-list"></ul>
+  <ul id="file-list">
+    {% assign root_files = site.static_files | where_exp: "file", "file.path contains '/'" %}
+    {% for file in root_files %}
+      {% assign path_parts = file.path | split: "/" %}
+      {% if path_parts.size == 2 %}
+        {% unless file.name == "README.md" or file.name == "index.html" or file.name == "script.js" %}
+          <li>
+            {% if file.extname == "" %}
+              {% assign folder_name = file.name %}
+              <details open>
+                <summary>{{ folder_name }}</summary>
+                <ul>
+                  {% include file_tree.html path=folder_name %}
+                </ul>
+              </details>
+            {% else %}
+              <a href="{{ site.baseurl }}{{ file.path }}" target="_blank">{{ file.name }}</a>
+            {% endif %}
+          </li>
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+  </ul>
 </div>
