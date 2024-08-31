@@ -1,0 +1,9 @@
+# _config.yml
+
+plugins:
+  - jekyll-remote-theme
+remote_theme: mimneko/Kiss-Jekyll-Lite@v1.0.0
+
+baseurl: "/kanken-1"
+url: "https://mimneko.github.io" # サイトのURL。
+styles: ["/assets/css/styles.css"]
