@@ -20,7 +20,7 @@ function createFileLink(file) {
 async function displayFiles(parentElement, path = '') {
     const files = await getFiles(path);
     for (const file of files) {
-        if (['README.md', 'index.html', 'script.js'].includes(file.name)) {
+        if (['README.md', 'index.html', 'script.js', '_config.yml'].includes(file.name)) {
             continue;
         }
         const li = document.createElement('li');
